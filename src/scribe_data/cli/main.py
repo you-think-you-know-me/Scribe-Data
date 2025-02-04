@@ -19,6 +19,8 @@ from scribe_data.cli.list import list_wrapper
 from scribe_data.cli.total import total_wrapper
 from scribe_data.cli.upgrade import upgrade_cli
 from scribe_data.cli.version import get_version_message
+from scribe_data.cli.contracts.check import check_contract
+from scribe_data.cli.contracts.export import export_contracts
 from scribe_data.utils import (
     DEFAULT_CSV_EXPORT_DIR,
     DEFAULT_DUMP_EXPORT_DIR,
@@ -312,6 +314,36 @@ def main() -> None:
     )
     interactive_parser._actions[0].help = "Show this help message and exit."
 
+    # MARK: Contract Commands
+
+    # Add 'check-contract' command
+    check_contract_parser = subparsers.add_parser(
+        "check-contract",
+        help="Check if all required contract fields exist in the data.",
+        description="Checks that all fields defined in the contract files exist in the corresponding data.",
+    )
+    check_contract_parser.add_argument(
+        "-od",
+        "--output-dir",
+        type=str,
+        required=True,
+        help="Directory containing exported data.",
+    )
+
+    # Add 'export-contracts' command
+    export_contracts_parser = subparsers.add_parser(
+        "export-contracts",
+        help="Export contract files to a specified directory.",
+        description="Exports contract JSON files from the data-contracts directory to the specified location.",
+    )
+    export_contracts_parser.add_argument(
+        "-od",
+        "--output-dir",
+        type=str,
+        required=True,
+        help="Directory to export contract files.",
+    )
+
     # MARK: Setup CLI
 
     args = parser.parse_args()
@@ -443,6 +475,11 @@ def main() -> None:
 
             else:
                 print("Skipping action")
+        elif args.command == "check-contract":
+            check_contract(args.output_dir)
+
+        elif args.command == "export-contracts":
+            export_contracts(args.output_dir)
 
         else:
             parser.print_help()
